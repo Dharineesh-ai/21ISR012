@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Average Calculator UI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7f8;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #333;
+    }
+    .container {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+    label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    select {
+      padding: 5px 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    .numbers-list {
+      margin-bottom: 20px;
+    }
+    .numbers-list span {
+      display: inline-block;
+      background: #007bff;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      margin: 2px;
+      font-size: 14px;
+    }
+    .average {
+      font-size: 18px;
+      font-weight: bold;
+      color: #444;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>Average Calculator</h1>
+  <div class="container">
+    <label for="numberType">Select Number Type:</label>
+    <select id="numberType">
+      <option value="p">Primes</option>
+      <option value="f">Fibonacci</option>
+      <option value="e">Even</option>
+      <option value="r">Random</option>
+    </select>
+    <div class="numbers-list" id="numbersList">Numbers: </div>
+    <div class="average" id="average">Average: </div>
+  </div>
+  <div class="footer">Data fetched from backend API</div>
+
+  <script>
+    const numberTypeSelect = document.getElementById('numberType');
+    const numbersListDiv = document.getElementById('numbersList');
+    const averageDiv = document.getElementById('average');
+
+    async function fetchNumbers(type) {
+      try {
+        const response = await fetch(`/numbers/${type}`);
+        const data = await response.json();
+        const numbers = data.windowCurrState || [];
+        const avg = data.avg || 0;
+
+        numbersListDiv.innerHTML = 'Numbers: ' + numbers.map(n => `<span>${n}</span>`).join(' ');
+        averageDiv.textContent = 'Average: ' + avg;
+      } catch (error) {
+        numbersListDiv.textContent = 'Error fetching numbers';
+        averageDiv.textContent = '';
+      }
+    }
+
+    numberTypeSelect.addEventListener('change', () => {
+      fetchNumbers(numberTypeSelect.value);
+    });
+
+    // Initial fetch
+    fetchNumbers(numberTypeSelect.value);
+
+    // Refresh data every 5 seconds
+    setInterval(() => {
+      fetchNumbers(numberTypeSelect.value);
+    }, 5000);
+  </script>
+</body>
+</html>
